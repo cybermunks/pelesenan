@@ -41,20 +41,17 @@
 </div>
 
 <script>
-    // GANTIKAN DENGAN URL WEB APP BARU ANDA
+    // Gantikan dengan URL Web App baru yang anda salin tadi
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBDQfsgemF70nWJPTiXPmTPERueMq5ZIslp81DjNvJWIVUjlrvUIZ_xu5SpLUj1GY/exec';
     const form = document.getElementById('mainForm');
-    const btn = document.getElementById('submitBtn');
-    const statusDiv = document.getElementById('status');
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-        statusDiv.style.display = 'none';
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Memproses...';
 
-        const fileInput = document.getElementById('fileField');
-        const file = fileInput.files[0];
+        const file = document.getElementById('fileField').files[0];
         const reader = new FileReader();
 
         reader.onload = function() {
@@ -66,26 +63,14 @@
 
             fetch(SCRIPT_URL, { method: 'POST', body: formData })
                 .then(res => res.text())
-                .then(text => {
-                    statusDiv.style.display = 'block';
-                    if(text.includes("Berjaya")) {
-                        statusDiv.style.backgroundColor = '#d4edda';
-                        statusDiv.style.color = '#155724';
-                        statusDiv.innerHTML = 'Data Berjaya Disimpan!';
-                        form.reset();
-                    } else {
-                        throw new Error(text);
-                    }
+                .then(data => {
+                    alert('Data Berjaya Disimpan!');
+                    form.reset();
                 })
-                .catch(err => {
-                    statusDiv.style.display = 'block';
-                    statusDiv.style.backgroundColor = '#f8d7da';
-                    statusDiv.style.color = '#721c24';
-                    statusDiv.innerHTML = 'Ralat: ' + err.message;
-                })
+                .catch(err => alert('Ralat: ' + err))
                 .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Data';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Hantar Data';
                 });
         };
         reader.readAsDataURL(file);
