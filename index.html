@@ -8,82 +8,41 @@
     <style>
         :root { --primary: #1a73e8; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        
         .form-card { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         h2 { color: var(--primary); text-align: center; margin-bottom: 25px; }
-
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; }
-        
-        /* Selaraskan semua input & placeholder */
-        input, select, textarea { 
-            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; 
-            box-sizing: border-box; font-size: 15px; font-family: 'Segoe UI', sans-serif; transition: 0.3s;
-        }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
-        
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; font-family: 'Segoe UI', sans-serif; }
         ::placeholder { font-family: 'Segoe UI', sans-serif; color: #aaa; }
-
-        .btn-submit { 
-            width: 100%; background: var(--primary); color: white; padding: 15px; border: none; 
-            border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-        
-        #status { margin-top: 15px; text-align: center; font-weight: bold; padding: 10px; border-radius: 5px; display: none; }
+        .btn-submit { width: 100%; background: var(--primary); color: white; padding: 15px; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #status { margin-top: 15px; text-align: center; font-weight: bold; padding: 10px; border-radius: 5px; display: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="form-card">
     <h2><i class="fas fa-file-alt"></i> Borang Permohonan Pro</h2>
-    
     <form id="mainForm">
-        <div class="form-group">
-            <label>No. Fail</label>
-            <input type="text" name="noFail" placeholder="Contoh: FAIL/2026/001" required>
-        </div>
-
-        <div class="form-group">
-            <label>Nama Pemohon</label>
-            <input type="text" name="namaPemohon" placeholder="Masukkan nama penuh" required>
-        </div>
-
-        <div class="form-group">
-            <label>Alamat Premis</label>
-            <textarea name="alamatPremis" rows="3" placeholder="Alamat lengkap premis"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Jenis Perniagaan</label>
+        <div class="form-group"><label>No. Fail</label><input type="text" name="noFail" placeholder="Contoh: FAIL/2026/001" required></div>
+        <div class="form-group"><label>Nama Pemohon</label><input type="text" name="namaPemohon" placeholder="Masukkan nama penuh" required></div>
+        <div class="form-group"><label>Alamat Premis</label><textarea name="alamatPremis" rows="3" placeholder="Alamat lengkap"></textarea></div>
+        <div class="form-group"><label>Jenis Perniagaan</label>
             <select name="jenisPerniagaan" required>
-                <option value="" disabled selected>Sila pilih jenis perniagaan</option>
-                <option value="Makanan">Makanan & Minuman</option>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="Makanan">Makanan</option>
                 <option value="Perkhidmatan">Perkhidmatan</option>
-                <option value="Peruncitan">Peruncitan</option>
             </select>
         </div>
-
-        <div class="form-group">
-            <label>Tarikh Terima Permohonan</label>
-            <input type="date" name="tarikhTerima" required>
-        </div>
-
-        <div class="form-group">
-            <label>Muat Naik Dokumen (PDF/Imej)</label>
-            <input type="file" id="fileField" required>
-        </div>
-
-        <button type="submit" id="submitBtn" class="btn-submit">
-            <i class="fas fa-paper-plane"></i> Hantar Permohonan
-        </button>
+        <div class="form-group"><label>Tarikh Terima</label><input type="date" name="tarikhTerima" required></div>
+        <div class="form-group"><label>Muat Naik Dokumen</label><input type="file" id="fileField" required></div>
+        <button type="submit" id="submitBtn" class="btn-submit"><i class="fas fa-paper-plane"></i> Hantar Data</button>
     </form>
-    
     <div id="status"></div>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxBDQfsgemF70nWJPTiXPmTPERueMq5ZIslp81DjNvJWIVUjlrvUIZ_xu5SpLUj1GY/exec';
+    // GANTIKAN DENGAN URL WEB APP BARU ANDA
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBDQfsgemF70nWJPTiXPmTPERueMq5ZIslp81DjNvJWIVUjlrvUIZ_xu5SpLUj1GY/exec';
     const form = document.getElementById('mainForm');
     const btn = document.getElementById('submitBtn');
     const statusDiv = document.getElementById('status');
@@ -94,38 +53,43 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
         statusDiv.style.display = 'none';
 
-        const file = document.getElementById('fileField').files[0];
+        const fileInput = document.getElementById('fileField');
+        const file = fileInput.files[0];
         const reader = new FileReader();
 
         reader.onload = function() {
             const base64Data = reader.result.split(',')[1];
             const formData = new FormData(form);
-            
             formData.append('fileData', base64Data);
             formData.append('mimeType', file.type);
             formData.append('fileName', file.name);
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => {
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+                .then(res => res.text())
+                .then(text => {
                     statusDiv.style.display = 'block';
-                    statusDiv.style.backgroundColor = '#d4edda';
-                    statusDiv.style.color = '#155724';
-                    statusDiv.innerHTML = 'Permohonan Berjaya Dihantar!';
-                    form.reset();
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permohonan';
+                    if(text.includes("Berjaya")) {
+                        statusDiv.style.backgroundColor = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.innerHTML = 'Data Berjaya Disimpan!';
+                        form.reset();
+                    } else {
+                        throw new Error(text);
+                    }
                 })
                 .catch(err => {
                     statusDiv.style.display = 'block';
                     statusDiv.style.backgroundColor = '#f8d7da';
                     statusDiv.style.color = '#721c24';
-                    statusDiv.innerHTML = 'Ralat: Gagal hantar data.';
+                    statusDiv.innerHTML = 'Ralat: ' + err.message;
+                })
+                .finally(() => {
                     btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Data';
                 });
         };
         reader.readAsDataURL(file);
     });
 </script>
-
 </body>
 </html>
